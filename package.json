@@ -2,12 +2,14 @@
   "name": "mega-k-to-do-list-be",
   "version": "1.0.0",
   "description": "",
-  "main": "src/index.ts",
+  "main": "index.js",
   "engines": {
     "node": "18.x"
   },
   "scripts": {
-    "start": "node src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc",
+    "dev": "ts-node-dev --clear index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "pre-commit": [
