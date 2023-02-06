@@ -7,6 +7,9 @@ app.use(json());
 
 import {taskRouter} from './routers';
 
+app.get('/', (req, res)=>{
+    res.send('Test')
+})
 app.use('/task', taskRouter);
 
 app.listen(PORT, ()=>{
