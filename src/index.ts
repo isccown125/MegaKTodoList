@@ -1,15 +1,15 @@
+import dotenv from 'dotenv';
+dotenv.config();
+import cors from 'cors';
 import express, {json} from 'express';
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 8000;
 const app = express();
+app.use(cors());
 
 app.use(json());
 
-
 import {taskRouter} from './routers';
 
-app.get('/', (req, res)=>{
-    res.send('Test')
-})
 app.use('/task', taskRouter);
 
 app.listen(PORT, ()=>{
