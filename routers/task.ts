@@ -7,7 +7,7 @@ export const taskRouter = express.Router();
 
 taskRouter.get('/all', async (req, res)=>{
     const tasks = await TaskModel.getAllTasks();
-    res.send(JSON.stringify(tasks))
+    res.status(200).send(JSON.stringify(tasks))
 })
     .post('/create', async (req, res)=>{
     const {title} = req.body;
