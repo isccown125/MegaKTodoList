@@ -1,7 +1,9 @@
 import {writeFile, readFile} from 'fs/promises';
 import {join} from 'path';
 import {v4 as uuid} from 'uuid';
-import {task, TaskEntity} from '../types/task';
+import {task, TaskEntity} from '../types';
+
+const FILE_PATH = join('./', 'src','json-database', 'list-task.json')
 
 
 export class TaskModel implements TaskEntity{
@@ -32,23 +34,24 @@ export class TaskModel implements TaskEntity{
         let tasks:task[] = [];
         try{
             if(!this.title){
-                throw new Error('Task is not created');
+                 new Error('Task is not created');
             }
-            const read = await readFile(join('./', 'src', 'json-database', 'list-task.json'), 'utf-8');
-            if(!read){
+            const read = await readFile(FILE_PATH, {encoding:"utf-8"});
+            if(read){
+                const parse = JSON.parse(read);
+                tasks = [...parse]
                 tasks.push(this)
                 const taskToJson = JSON.stringify(tasks);
-                await writeFile(join('./', 'src', 'json-database', 'list-task.json'), taskToJson,{encoding:'utf-8'});
+                await writeFile(FILE_PATH, taskToJson,{encoding:'utf-8'});
                 return
             }
-            const parse = JSON.parse(read);
-            tasks = [...parse];
             tasks.push(this)
             const taskToJson = JSON.stringify(tasks);
-            await writeFile(join('./', 'src', 'json-database', 'list-task.json'), taskToJson,{encoding:'utf-8'});
+            await writeFile(FILE_PATH, taskToJson,{encoding:'utf-8'});
 
 
         }catch (e){
+            console.log(e)
         }
     }
     async modifyTask(obj:{id:string, isDone?:boolean, title?:string}){
@@ -74,13 +77,13 @@ export class TaskModel implements TaskEntity{
         if(obj.isDone === false || obj.isDone === true){
             this.isDone = obj.isDone;
         }
-        const read = await readFile(join('./', 'src', 'json-database', 'list-task.json'), 'utf-8');
+        const read = await readFile(FILE_PATH, 'utf-8');
         const tasks = JSON.parse(read);
         if(tasks){
             const taskIndex = tasks.findIndex((el:task)=>el.id===this.id);
             tasks[taskIndex] = this;
             const taskToJson = JSON.stringify(tasks);
-            await writeFile(join('./', 'src', 'json-database', 'list-task.json'), taskToJson,{encoding:'utf-8'});
+            await writeFile(FILE_PATH, taskToJson,{encoding:'utf-8'});
         }
 
     }
@@ -88,7 +91,7 @@ export class TaskModel implements TaskEntity{
         if(!id){
             throw new Error('Cannot delete task!');
         }
-        const read = await readFile(join('./', 'src', 'json-database', 'list-task.json'), 'utf-8');
+        const read = await readFile(FILE_PATH, 'utf-8');
         if(read){
             const tasks = JSON.parse(read);
             const taskIndex = tasks.findIndex((el:task)=>el.id===id);
@@ -98,7 +101,7 @@ export class TaskModel implements TaskEntity{
             tasks.splice(taskIndex, 1);
             if(tasks){
                 const tasksToJson = JSON.stringify(tasks);
-                await writeFile(join('./', 'src', 'json-database', 'list-task.json'), tasksToJson,{encoding:'utf-8'});
+                await writeFile(FILE_PATH, tasksToJson,{encoding:'utf-8'});
             }
         }
     }
@@ -106,7 +109,7 @@ export class TaskModel implements TaskEntity{
         if(!id){
             throw new Error('Cannot find task!');
         }
-        const read = await readFile(join('./', 'src', 'json-database', 'list-task.json'), 'utf-8');
+        const read = await readFile(FILE_PATH, 'utf-8');
         if(read){
             const tasks = JSON.parse(read);
             const task = tasks.find((el:task)=>el.id===id);
@@ -117,7 +120,11 @@ export class TaskModel implements TaskEntity{
         }
     }
     static async getAllTasks (){
-        const read = await readFile(join('./', 'src', 'json-database', 'list-task.json'), 'utf-8');
+        const read = await readFile(FILE_PATH, {encoding:"utf-8", flag:"a+"});
+        if(!read){
+            console.log('log');
+            return await writeFile(FILE_PATH, JSON.stringify([]),{encoding:"utf-8"});
+        }
         if(read){
             return JSON.parse(read);
         }
