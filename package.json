@@ -8,7 +8,10 @@
     "build": "tsc",
     "dev": "ts-node src/index.ts",
     "dev-with-restart": "nodemon src/index.ts",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prepare": "husky install",
+    "format": "npx prettier --write .",
+    "check-format": "npx prettier --check ."
   },
   "pre-commit": [
     "ts.check",
@@ -21,6 +24,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
+    "express-async-errors": "^3.1.1",
     "mysql2": "^2.3.3",
     "ts-node": "^10.9.1",
     "typeorm": "^0.3.11",
@@ -33,9 +37,14 @@
     "@types/node": "^18.11.18",
     "@types/typescript": "^2.0.0",
     "@types/uuid": "^9.0.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^13.1.1",
     "nodemon": "^2.0.20",
     "pre-commit": "^1.2.2",
     "prettier": "2.8.3",
     "rimraf": "^4.1.2"
+  },
+  "lint-staged": {
+    "**/*": "prettier --write --ignore-unknown"
   }
 }
