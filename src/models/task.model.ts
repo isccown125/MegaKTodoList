@@ -2,7 +2,11 @@ import { writeFile, readFile } from "fs/promises";
 import { join } from "path";
 import { v4 as uuid } from "uuid";
 import { task, TaskEntity } from "../types";
-import { NotFoundTaskException } from "../exceptions";
+import {
+  NoTaskTitleException,
+  NotFoundTaskException,
+  TaskTitleException,
+} from "../exceptions";
 
 const FILE_PATH = join("./", "src", "json-database", "list-task.json");
 
@@ -22,18 +26,12 @@ export class TaskModel implements TaskEntity {
   }
   createTask(title: string) {
     if (!title) {
-      throw new Error("You didn't provide a title");
+      throw new NoTaskTitleException();
     }
     if (title.length > 70 || title.length < 3) {
-      throw new Error("Your title must include between 3 and 70 characters");
+      throw new TaskTitleException(title, 3, 70);
     }
     this.title = title;
-    return {
-      title: this.title,
-      isDone: this.isDone,
-      dateAdd: this.dateAdd,
-      dateModify: this.dateModify,
-    };
   }
   async saveTask() {
     let tasks: task[] = [];
@@ -91,7 +89,7 @@ export class TaskModel implements TaskEntity {
   }
   static async deleteTask(id: string) {
     if (!id) {
-      throw new Error("Cannot delete task!");
+      new NotFoundTaskException(id);
     }
     const read = await readFile(FILE_PATH, "utf-8");
     if (read) {

@@ -15,22 +15,11 @@ taskRouter
   })
   .put("/", async (req, res) => {
     const { title } = req.body;
-    if (!title) {
-      res.status(400).json({ error: 400, message: "Task cannot be created!" });
-      return res.end();
-    }
-    try {
-      const task = new TaskModel();
-      task.createTask(title);
-      await task.saveTask();
-      res.status(201).json({ message: "Task created!" });
-      res.end();
-    } catch (e) {
-      res.status(400).send({
-        error: 400,
-        message: "Your title must include between 3 and 70 characters",
-      });
-    }
+    const task = new TaskModel();
+    task.createTask(title);
+    await task.saveTask();
+    res.status(201).json({ message: `Task created with title: ${title}` });
+    res.end();
   })
   .delete("/", async (req, res) => {
     const { id } = req.body;

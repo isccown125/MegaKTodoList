@@ -1,6 +1,7 @@
 import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
+import "express-async-errors";
 import express, { json } from "express";
 const PORT = process.env.PORT || 8001;
 const app = express();
