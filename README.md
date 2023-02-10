@@ -2,7 +2,7 @@
 
 
 App made by Patryk Orzech. This app is host on my own server:) 
-https://patryk-orzech.pl/megak-todolist/ 
+[megak-todolist](https://patryk-orzech.pl/megak-todolist/) 
 ## Table of content 
 * [Technologies](#technologies) 
 * [Installation](#installation) 
