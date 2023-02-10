@@ -1,64 +1,65 @@
 import express from "express";
-import {TaskModel} from "../models/task.model";
+import { TaskModel } from "../models/task.model";
 export const taskRouter = express.Router();
 
-
-taskRouter.get('/', async (req, res)=>{
-    try{
-        const tasks = await TaskModel.getAllTasks();
-        res.status(200).json(tasks);
-        res.end();
-    }catch (e){
-        res.status(400).json({error: 400, message: `Cannot get tasks!`});
-        res.end();
+taskRouter
+  .get("/", async (req, res) => {
+    try {
+      const tasks = await TaskModel.getAllTasks();
+      res.status(200).json(tasks);
+      res.end();
+    } catch (e) {
+      res.status(400).json({ error: 400, message: `Cannot get tasks!` });
+      res.end();
     }
-
-})
-    .put('/', async (req, res)=>{
-    const {title} = req.body;
-    if(!title){
-        res.status(400).json({error: 400, message: "Task cannot be created!"});
-       return  res.end();
+  })
+  .put("/", async (req, res) => {
+    const { title } = req.body;
+    if (!title) {
+      res.status(400).json({ error: 400, message: "Task cannot be created!" });
+      return res.end();
     }
-    try{
-        const task = new TaskModel();
-        task.createTask(title);
-        await task.saveTask();
-        res.status(201).json({message: "Task created!"});
-        res.end();
+    try {
+      const task = new TaskModel();
+      task.createTask(title);
+      await task.saveTask();
+      res.status(201).json({ message: "Task created!" });
+      res.end();
+    } catch (e) {
+      res.status(400).send({
+        error: 400,
+        message: "Your title must include between 3 and 70 characters",
+      });
     }
-    catch(e){
-        res.status(400).send({error: 400, message:'Your title must include between 3 and 70 characters'})
+  })
+  .delete("/", async (req, res) => {
+    const { id } = req.body;
+    if (!id) {
+      res.status(400).json({ error: 400, message: "Task cannot be delete!" });
+      return res.end();
     }
-}).delete('/',async (req, res)=>{
-    const {id} = req.body;
-    if(!id){
-       res.status(400).json({error: 400, message: "Task cannot be delete!"});
-        return res.end();
+    try {
+      await TaskModel.deleteTask(id);
+      res.status(200).json({ message: "Task delete!" });
+      res.end();
+    } catch (error) {
+      res.status(400).json({ error: 400, message: "Task cannot be delete!" });
+      res.end();
     }
-    try{
-        await TaskModel.deleteTask(id);
-        res.status(200).json({message: "Task delete!"});
-        res.end();
+  })
+  .patch("/", async (req, res) => {
+    const { id, title, isDone } = req.body;
+    if (!id) {
+      res.status(400).json({ error: 400, message: "Cannot update task!" });
+      return res.end();
     }
-    catch (e){
-        res.status(400).json({error:400, message: "Task cannot be delete!"});
-        res.end();
+    try {
+      const task = new TaskModel();
+      await task.modifyTask({ id, title, isDone });
+      res.status(200).json({ message: "Task updated!" });
+      res.end();
+    } catch (e) {
+      res.status(400).json({ error: 400, message: "Cannot update task!" });
+      res.end();
     }
-}).patch('/', async (req, res)=>{
-    const {id, title, isDone} = req.body;
-    if(!id){
-        res.status(400).json({error: 400, message:'Cannot update task!'})
-        return res.end();
-    }
-    try{
-        const task = new TaskModel();
-        await task.modifyTask({id, title, isDone});
-        res.status(200).json({message: "Task updated!"})
-        res.end();
-    }catch(e){
-        res.status(400).json({error: 400, message:'Cannot update task!'})
-        res.end();
-    }
-})
-
+  });
