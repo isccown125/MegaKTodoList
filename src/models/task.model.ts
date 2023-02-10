@@ -56,12 +56,12 @@ export class TaskModel implements TaskEntity {
     }
   }
   async modifyTask(obj: { id: string; isDone?: boolean; title?: string }) {
-    if (!obj.id && (!obj.title || !obj.isDone)) {
-      throw new Error("Not id!");
+    if (!obj.id) {
+      throw new NotFoundTaskException();
     }
     const task = await this.findById(obj.id);
     if (!task) {
-      throw new Error("Cannot find task!");
+      throw new NotFoundTaskException();
     }
     this.id = task.id;
     this.dateModify = new Date();
@@ -69,7 +69,7 @@ export class TaskModel implements TaskEntity {
     this.title = task.title;
     this.isDone = task.isDone;
     if (obj.title && (obj.title.length > 70 || obj.title.length < 3)) {
-      throw new Error("Your title must include between 3 and 70 characters");
+      throw new TaskTitleException(obj.title, 3, 70);
     }
     if (obj.title) {
       this.title = obj.title;
@@ -87,16 +87,18 @@ export class TaskModel implements TaskEntity {
       await writeFile(FILE_PATH, taskToJson, { encoding: "utf-8" });
     }
   }
-  static async deleteTask(id: string) {
+  async deleteTask(id: string) {
     if (!id) {
-      new NotFoundTaskException(id);
+      throw new NotFoundTaskException();
     }
     const read = await readFile(FILE_PATH, "utf-8");
+
     if (read) {
       const tasks = JSON.parse(read);
       const taskIndex = tasks.findIndex((el: task) => el.id === id);
-      if (taskIndex === undefined) {
-        new NotFoundTaskException(id);
+      console.log(taskIndex);
+      if (taskIndex === -1) {
+        throw new NotFoundTaskException();
       }
       tasks.splice(taskIndex, 1);
       if (tasks) {
@@ -107,14 +109,14 @@ export class TaskModel implements TaskEntity {
   }
   async findById(id: string) {
     if (!id) {
-      throw new Error("Cannot find task!");
+      throw new NotFoundTaskException();
     }
     const read = await readFile(FILE_PATH, "utf-8");
     if (read) {
       const tasks = JSON.parse(read);
       const task = tasks.find((el: task) => el.id === id);
       if (!task) {
-        throw new Error("Cannot find task!");
+        throw new NotFoundTaskException();
       }
       return task;
     }
